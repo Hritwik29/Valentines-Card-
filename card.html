@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>For You 💫</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #1e1a28;
+      --paper: #f8f5f0;
+      --paper-warm: #fdfbf7;
+      --gold: #b8860b;
+      --gold-soft: #e8d9a8;
+      --gold-glow: rgba(184, 134, 11, 0.25);
+      --blush: #c9a0a0;
+      --night: #0d0b12;
+      --envelope: #252035;
+      --envelope-light: #322d45;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: 
+        radial-gradient(ellipse 120% 80% at 50% -20%, rgba(50, 45, 70, 0.6) 0%, transparent 50%),
+        radial-gradient(ellipse 80% 50% at 80% 50%, rgba(184, 134, 11, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse 80% 50% at 20% 80%, rgba(184, 134, 11, 0.04) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 100%, #1a1628 0%, #0d0b12 40%, #060508 100%);
+      font-family: 'Cormorant Garamond', serif;
+      overflow-x: hidden;
+    }
+
+    /* Subtle grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .card-container {
+      position: relative;
+      z-index: 2;
+      perspective: 1400px;
+      cursor: pointer;
+    }
+
+    body.card-open .card-container {
+      z-index: 5;
+    }
+
+    /* Envelope */
+    .envelope-wrapper {
+      position: relative;
+      width: 340px;
+      height: 235px;
+      transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .envelope-wrapper:hover:not(.opened) {
+      transform: translateY(-4px) scale(1.02);
+    }
+
+    .envelope-wrapper.opened {
+      transform: scale(0.88);
+    }
+
+    .envelope {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(160deg, var(--envelope-light) 0%, var(--envelope) 50%, #1c1928 100%);
+      border-radius: 6px;
+      box-shadow: 
+        0 30px 60px rgba(0,0,0,0.55),
+        0 0 0 1px rgba(255,255,255,0.04),
+        inset 0 1px 0 rgba(255,255,255,0.06);
+      border: 1px solid rgba(184, 134, 11, 0.18);
+    }
+
+    .envelope-flap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 0;
+      border-left: 170px solid transparent;
+      border-right: 170px solid transparent;
+      border-top: 117px solid #3d3652;
+      transform-origin: top center;
+      transition: transform 0.9s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      filter: drop-shadow(0 -3px 8px rgba(0,0,0,0.4));
+      border-radius: 0 0 2px 2px;
+    }
+
+    .envelope-wrapper.opened .envelope-flap {
+      transform: rotateX(-178deg);
+    }
+
+    .envelope-front {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 6px;
+      color: var(--gold-soft);
+      font-size: 1rem;
+      letter-spacing: 0.35em;
+      font-weight: 500;
+      text-shadow: 0 0 30px var(--gold-glow);
+      opacity: 0.95;
+    }
+
+    .envelope-front .heart-icon {
+      font-size: 1.2rem;
+      opacity: 0.8;
+      animation: gentle-pulse 3s ease-in-out infinite;
+    }
+
+    @keyframes gentle-pulse {
+      0%, 100% { opacity: 0.7; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.1); }
+    }
+
+    .open-hint {
+      position: absolute;
+      bottom: -56px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--gold-soft);
+      font-family: 'Quicksand', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.25em;
+      padding: 10px 20px;
+      background: rgba(184, 134, 11, 0.12);
+      border: 1px solid rgba(184, 134, 11, 0.25);
+      border-radius: 24px;
+      backdrop-filter: blur(8px);
+      animation: pulse 2.5s ease-in-out infinite;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+    .open-hint::after {
+      content: ' ↑';
+      font-size: 0.9em;
+      opacity: 0.8;
+    }
+
+    .envelope-wrapper.opened .open-hint {
+      display: none;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.85; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+      50% { opacity: 1; box-shadow: 0 4px 28px var(--gold-glow); }
+    }
+
+    /* Inner pop-up card - rich borders */
+    .inner-card {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.9);
+      width: 300px;
+      min-height: 440px;
+      background: 
+        linear-gradient(180deg, var(--paper-warm) 0%, var(--paper) 50%, #f0ebe3 100%);
+      border-radius: 16px;
+      padding: 36px 28px;
+      border: 3px solid var(--gold);
+      box-shadow: 
+        0 0 0 1px rgba(184, 134, 11, 0.4),
+        0 0 0 4px rgba(255, 248, 230, 0.6),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.8),
+        0 40px 80px rgba(0,0,0,0.35),
+        0 0 60px -10px var(--gold-glow);
+      opacity: 0;
+      transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease, box-shadow 0.5s ease;
+      pointer-events: none;
+    }
+
+    .envelope-wrapper.opened .inner-card {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+      pointer-events: auto;
+      z-index: 10;
+      box-shadow: 
+        0 0 0 1px rgba(184, 134, 11, 0.5),
+        0 0 0 4px rgba(255, 248, 230, 0.7),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.9),
+        0 40px 80px rgba(0,0,0,0.4),
+        0 0 80px -8px var(--gold-glow);
+    }
+
+    /* Inner decorative border - double frame */
+    .inner-card::before {
+      content: '';
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      border: 2px solid rgba(184, 134, 11, 0.35);
+      border-radius: 10px;
+      pointer-events: none;
+    }
+
+    .inner-card::after {
+      content: '';
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      bottom: 16px;
+      border: 1px solid rgba(184, 134, 11, 0.18);
+      border-radius: 6px;
+      pointer-events: none;
+    }
+
+    /* Constellation heart */
+    .heart-container {
+      position: relative;
+      width: 150px;
+      height: 140px;
+      margin: 0 auto 28px;
+    }
+
+    .heart-svg {
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 0.8s ease 0.3s;
+      filter: drop-shadow(0 2px 8px var(--gold-glow));
+    }
+
+    .envelope-wrapper.opened .heart-svg {
+      opacity: 1;
+    }
+
+    .star {
+      fill: var(--gold);
+      animation: twinkle 2.2s ease-in-out infinite;
+    }
+
+    .star:nth-child(odd) { animation-delay: 0.3s; }
+    .star:nth-child(3n) { animation-delay: 0.6s; }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.55; }
+    }
+
+    .heart-line {
+      fill: none;
+      stroke: var(--gold);
+      stroke-width: 1.4;
+      stroke-opacity: 0.55;
+      stroke-dasharray: 320;
+      stroke-dashoffset: 320;
+      transition: stroke-dashoffset 1.2s ease 0.5s;
+    }
+
+    .envelope-wrapper.opened .heart-line {
+      stroke-dashoffset: 0;
+    }
+
+    .card-divider {
+      width: 40px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 0 auto 20px;
+      opacity: 0.5;
+    }
+
+    .card-title {
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+      text-transform: none;
+      text-align: center;
+      margin-bottom: 12px;
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    .card-message {
+      font-size: 1.05rem;
+      line-height: 1.65;
+      color: var(--ink);
+      text-align: center;
+      font-weight: 400;
+      margin-bottom: 20px;
+      letter-spacing: 0.02em;
+    }
+
+    .card-message em {
+      font-style: italic;
+      color: #534a62;
+      font-weight: 500;
+    }
+
+    .card-special-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      color: var(--gold);
+      text-transform: uppercase;
+      text-align: center;
+      margin: 22px 0 10px;
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 600;
+    }
+
+    .card-special-message {
+      font-size: 1.1rem;
+      line-height: 1.7;
+      color: var(--ink);
+      text-align: center;
+      padding: 18px 16px;
+      background: linear-gradient(135deg, rgba(184, 134, 11, 0.06) 0%, rgba(184, 134, 11, 0.02) 100%);
+      border-radius: 10px;
+      border: 1px solid rgba(184, 134, 11, 0.2);
+      font-style: italic;
+      margin-bottom: 20px;
+      min-height: 76px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
+    }
+
+    .card-sign {
+      text-align: right;
+      font-style: italic;
+      color: var(--ink);
+      font-size: 1.15rem;
+      opacity: 0.92;
+      letter-spacing: 0.02em;
+    }
+
+    .card-sign .sign-emoji {
+      margin-left: 4px;
+      display: inline-block;
+      animation: emoji-wiggle 2s ease-in-out infinite;
+    }
+
+    /* Emoji strip under title */
+    .emoji-strip {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      font-size: 1.35rem;
+      letter-spacing: 4px;
+    }
+
+    .emoji-strip span {
+      display: inline-block;
+      animation: emoji-pop 2.5s ease-in-out infinite;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+    }
+
+    .emoji-strip span:nth-child(1) { animation-delay: 0s; }
+    .emoji-strip span:nth-child(2) { animation-delay: 0.2s; }
+    .emoji-strip span:nth-child(3) { animation-delay: 0.4s; }
+    .emoji-strip span:nth-child(4) { animation-delay: 0.6s; }
+    .emoji-strip span:nth-child(5) { animation-delay: 0.8s; }
+    .emoji-strip span:nth-child(6) { animation-delay: 1s; }
+
+    /* Emoji strip hidden when message is open */
+    .envelope-wrapper.opened .emoji-strip {
+      display: none;
+    }
+
+    @keyframes emoji-pop {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.15) rotate(5deg); }
+    }
+
+    @keyframes emoji-wiggle {
+      0%, 100% { transform: rotate(-3deg); }
+      50% { transform: rotate(3deg); }
+    }
+
+    /* Floating emojis when card is open */
+    .float-emoji {
+      position: absolute;
+      font-size: 1.1rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease 0.4s;
+    }
+
+    /* Floating emojis hidden when message is open */
+    .envelope-wrapper.opened .float-emoji {
+      opacity: 0;
+    }
+
+    .float-emoji.e1 { top: 8px; right: 12px; animation: float-emoji 4s ease-in-out infinite; }
+    .float-emoji.e2 { top: 20px; left: 14px; animation: float-emoji 5s ease-in-out infinite 0.5s; }
+    .float-emoji.e3 { bottom: 70px; right: 8px; animation: float-emoji 4.5s ease-in-out infinite 1s; }
+    .float-emoji.e4 { bottom: 80px; left: 10px; animation: float-emoji 5.5s ease-in-out infinite 0.3s; }
+    .float-emoji.e5 { top: 50%; left: -4px; margin-top: -0.5em; animation: float-emoji 4s ease-in-out infinite 0.7s; }
+    .float-emoji.e6 { top: 50%; right: -4px; margin-top: -0.5em; animation: float-emoji 4.8s ease-in-out infinite 0.2s; }
+
+    @keyframes float-emoji {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    .float-emoji.e5, .float-emoji.e6 {
+      font-size: 1rem;
+    }
+
+    /* Special message emoji accent */
+    .special-emoji {
+      font-size: 1.25rem;
+      display: block;
+      margin-bottom: 6px;
+      animation: emoji-pop 2s ease-in-out infinite;
+    }
+
+    /* Floating stars bg */
+    .stars-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .star-dot {
+      position: absolute;
+      background: var(--gold-soft);
+      border-radius: 50%;
+      opacity: 0.35;
+      animation: float 10s ease-in-out infinite;
+    }
+
+    .star-dot:nth-child(1) { left: 8%; top: 18%; width: 2px; height: 2px; animation-delay: 0s; }
+    .star-dot:nth-child(2) { left: 88%; top: 12%; width: 3px; height: 3px; animation-delay: 1.2s; opacity: 0.5; }
+    .star-dot:nth-child(3) { left: 22%; top: 72%; width: 2px; height: 2px; animation-delay: 2.5s; }
+    .star-dot:nth-child(4) { left: 72%; top: 82%; width: 2px; height: 2px; animation-delay: 0.6s; }
+    .star-dot:nth-child(5) { left: 48%; top: 38%; width: 2px; height: 2px; animation-delay: 1.8s; }
+    .star-dot:nth-child(6) { left: 15%; top: 45%; width: 1px; height: 1px; animation-delay: 3s; }
+    .star-dot:nth-child(7) { left: 92%; top: 55%; width: 2px; height: 2px; animation-delay: 0.3s; }
+    .star-dot:nth-child(8) { left: 55%; top: 85%; width: 1px; height: 1px; animation-delay: 2s; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) scale(1); opacity: 0.35; }
+      50% { transform: translateY(-12px) scale(1.3); opacity: 0.75; }
+    }
+
+    /* ========== EXCITING FEATURES ========== */
+
+    /* 1. Hearts burst when card opens */
+    .hearts-burst {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 20;
+      opacity: 0;
+    }
+
+    body.card-open .hearts-burst {
+      animation: burst-appear 0.1s ease forwards;
+    }
+
+    body.card-open .hearts-burst.burst-done {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .heart-burst-item {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      font-size: 1.85rem;
+      opacity: 0;
+      animation: burst-out 1.2s ease-out forwards;
+    }
+
+    .heart-burst-item:nth-child(1) { animation-delay: 0s; --tx: 0; --ty: -120; }
+    .heart-burst-item:nth-child(2) { animation-delay: 0.05s; --tx: 85; --ty: -85; }
+    .heart-burst-item:nth-child(3) { animation-delay: 0.1s; --tx: 120; --ty: 0; }
+    .heart-burst-item:nth-child(4) { animation-delay: 0.15s; --tx: 85; --ty: 85; }
+    .heart-burst-item:nth-child(5) { animation-delay: 0.2s; --tx: 0; --ty: 120; }
+    .heart-burst-item:nth-child(6) { animation-delay: 0.25s; --tx: -85; --ty: 85; }
+    .heart-burst-item:nth-child(7) { animation-delay: 0.3s; --tx: -120; --ty: 0; }
+    .heart-burst-item:nth-child(8) { animation-delay: 0.35s; --tx: -85; --ty: -85; }
+    .heart-burst-item:nth-child(9) { animation-delay: 0.08s; --tx: 60; --ty: -104; }
+    .heart-burst-item:nth-child(10) { animation-delay: 0.18s; --tx: 104; --ty: 60; }
+    .heart-burst-item:nth-child(11) { animation-delay: 0.28s; --tx: -60; --ty: 104; }
+    .heart-burst-item:nth-child(12) { animation-delay: 0.12s; --tx: -104; --ty: -60; }
+    .heart-burst-item:nth-child(13) { animation-delay: 0.22s; --tx: 40; --ty: 113; }
+    .heart-burst-item:nth-child(14) { animation-delay: 0.32s; --tx: -113; --ty: 40; }
+    .heart-burst-item:nth-child(15) { animation-delay: 0.15s; --tx: 113; --ty: -40; }
+
+    @keyframes burst-appear {
+      to { opacity: 1; }
+    }
+
+    @keyframes burst-out {
+      0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.5) rotate(0deg);
+      }
+      40% {
+        opacity: 0.95;
+        transform: translate(calc(-50% + var(--tx) * 0.5px), calc(-50% + var(--ty) * 0.5px)) scale(1.1) rotate(120deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--tx) * 1px), calc(-50% + var(--ty) * 1px)) scale(0.6) rotate(360deg);
+      }
+    }
+
+    /* 2. Staggered message fade-in when card opens */
+    .card-message {
+      opacity: 0;
+    }
+
+    .envelope-wrapper.opened .card-message {
+      animation: messageFadeIn 1s ease 0.4s forwards;
+    }
+
+    @keyframes messageFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .envelope-wrapper.opened .card-title {
+      animation: messageFadeIn 0.6s ease 0.2s forwards;
+    }
+
+    .card-title { opacity: 0; }
+
+    /* 3. Floating hearts in background when card is open */
+    .floating-hearts {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0;
+      transition: opacity 0.6s ease 0.5s;
+    }
+
+    body.card-open .floating-hearts {
+      opacity: 1;
+    }
+
+    .floating-hearts span {
+      position: absolute;
+      bottom: -20px;
+      font-size: 1rem;
+      opacity: 0.6;
+      animation: heartRise 12s linear infinite;
+    }
+
+    .floating-hearts span:nth-child(1) { left: 10%; animation-delay: 0s; animation-duration: 14s; }
+    .floating-hearts span:nth-child(2) { left: 25%; animation-delay: 2s; animation-duration: 11s; }
+    .floating-hearts span:nth-child(3) { left: 40%; animation-delay: 4s; animation-duration: 13s; }
+    .floating-hearts span:nth-child(4) { left: 55%; animation-delay: 1s; animation-duration: 15s; }
+    .floating-hearts span:nth-child(5) { left: 70%; animation-delay: 3s; animation-duration: 12s; }
+    .floating-hearts span:nth-child(6) { left: 85%; animation-delay: 5s; animation-duration: 14s; }
+    .floating-hearts span:nth-child(7) { left: 18%; animation-delay: 6s; animation-duration: 16s; }
+    .floating-hearts span:nth-child(8) { left: 50%; animation-delay: 2.5s; animation-duration: 11s; }
+    .floating-hearts span:nth-child(9) { left: 92%; animation-delay: 1.5s; animation-duration: 13s; }
+
+    @keyframes heartRise {
+      0% {
+        transform: translateY(0) scale(0.6) rotate(0deg);
+        opacity: 0;
+      }
+      10% { opacity: 0.5; }
+      90% { opacity: 0.4; }
+      100% {
+        transform: translateY(-100vh) scale(1) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* 4. Gentle card float when open */
+    .envelope-wrapper.opened .inner-card {
+      animation: cardFloat 5s ease-in-out infinite 1s;
+    }
+
+    @keyframes cardFloat {
+      0%, 100% { transform: translate(-50%, -50%) scale(1) translateY(0); }
+      50% { transform: translate(-50%, -50%) scale(1) translateY(-6px); }
+    }
+
+    /* 5. Clickable heart - surprise pop */
+    .heart-container {
+      cursor: pointer;
+    }
+
+    .heart-container .heart-surprise {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      font-size: 2rem;
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0);
+      pointer-events: none;
+      transition: none;
+    }
+
+    .heart-container.clicked .heart-surprise {
+      animation: heartPop 0.8s ease-out forwards;
+    }
+
+    @keyframes heartPop {
+      0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.3);
+      }
+      50% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.4);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -120%) scale(1.2);
+      }
+    }
+
+    /* Confetti pop when card opens */
+    .confetti-pop {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 21;
+      opacity: 0;
+      overflow: visible;
+    }
+
+    body.card-open .confetti-pop:not(.confetti-done) {
+      opacity: 1;
+    }
+
+    body.card-open .confetti-pop.confetti-done {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      left: 50%;
+      top: 45%;
+      width: 14px;
+      height: 18px;
+      display: block;
+      opacity: 0;
+      animation: confetti-burst 2.5s ease-out forwards;
+      border-radius: 2px;
+    }
+
+    .confetti-piece:nth-child(5n+1) { background: #d4a017; }
+    .confetti-piece:nth-child(5n+2) { background: #ff9eb5; }
+    .confetti-piece:nth-child(5n+3) { background: #e63950; }
+    .confetti-piece:nth-child(5n+4) { background: #ffffff; box-shadow: 0 0 4px rgba(0,0,0,0.2); }
+    .confetti-piece:nth-child(5n+5) { background: #ffb7c5; }
+
+    .confetti-piece:nth-child(odd) { width: 16px; height: 10px; }
+
+    .confetti-piece:nth-child(1) { animation-delay: 0s; --cx: -90; --cy: -100; --fy: 120; }
+    .confetti-piece:nth-child(2) { animation-delay: 0.02s; --cx: 95; --cy: -88; --fy: 140; }
+    .confetti-piece:nth-child(3) { animation-delay: 0.04s; --cx: 0; --cy: -130; --fy: 100; }
+    .confetti-piece:nth-child(4) { animation-delay: 0.01s; --cx: -70; --cy: 85; --fy: 160; }
+    .confetti-piece:nth-child(5) { animation-delay: 0.03s; --cx: 78; --cy: 92; --fy: 150; }
+    .confetti-piece:nth-child(6) { animation-delay: 0.05s; --cx: -110; --cy: -40; --fy: 130; }
+    .confetti-piece:nth-child(7) { animation-delay: 0.02s; --cx: 100; --cy: 30; --fy: 140; }
+    .confetti-piece:nth-child(8) { animation-delay: 0.06s; --cx: -50; --cy: -115; --fy: 110; }
+    .confetti-piece:nth-child(9) { animation-delay: 0.01s; --cx: 60; --cy: -70; --fy: 150; }
+    .confetti-piece:nth-child(10) { animation-delay: 0.04s; --cx: -85; --cy: 60; --fy: 130; }
+    .confetti-piece:nth-child(11) { animation-delay: 0.03s; --cx: 88; --cy: -95; --fy: 120; }
+    .confetti-piece:nth-child(12) { animation-delay: 0.05s; --cx: -100; --cy: 0; --fy: 160; }
+    .confetti-piece:nth-child(13) { animation-delay: 0s; --cx: 70; --cy: 75; --fy: 140; }
+    .confetti-piece:nth-child(14) { animation-delay: 0.04s; --cx: -65; --cy: -85; --fy: 125; }
+    .confetti-piece:nth-child(15) { animation-delay: 0.02s; --cx: 105; --cy: -50; --fy: 155; }
+    .confetti-piece:nth-child(16) { animation-delay: 0.06s; --cx: -95; --cy: 95; --fy: 115; }
+    .confetti-piece:nth-child(17) { animation-delay: 0.01s; --cx: 45; --cy: -110; --fy: 145; }
+    .confetti-piece:nth-child(18) { animation-delay: 0.03s; --cx: -55; --cy: 45; --fy: 135; }
+    .confetti-piece:nth-child(19) { animation-delay: 0.05s; --cx: 112; --cy: 55; --fy: 125; }
+    .confetti-piece:nth-child(20) { animation-delay: 0.02s; --cx: -40; --cy: -120; --fy: 150; }
+    .confetti-piece:nth-child(21) { animation-delay: 0.04s; --cx: 82; --cy: -82; --fy: 130; }
+    .confetti-piece:nth-child(22) { animation-delay: 0s; --cx: -75; --cy: 70; --fy: 140; }
+    .confetti-piece:nth-child(23) { animation-delay: 0.03s; --cx: 98; --cy: 0; --fy: 120; }
+    .confetti-piece:nth-child(24) { animation-delay: 0.05s; --cx: -108; --cy: -55; --fy: 155; }
+    .confetti-piece:nth-child(25) { animation-delay: 0.01s; --cx: 52; --cy: 102; --fy: 115; }
+    .confetti-piece:nth-child(26) { animation-delay: 0.04s; --cx: -88; --cy: -95; --fy: 145; }
+    .confetti-piece:nth-child(27) { animation-delay: 0.02s; --cx: 65; --cy: -65; --fy: 135; }
+    .confetti-piece:nth-child(28) { animation-delay: 0.06s; --cx: -102; --cy: 40; --fy: 125; }
+    .confetti-piece:nth-child(29) { animation-delay: 0.03s; --cx: 90; --cy: 88; --fy: 150; }
+    .confetti-piece:nth-child(30) { animation-delay: 0s; --cx: -60; --cy: -105; --fy: 130; }
+    .confetti-piece:nth-child(31) { animation-delay: 0.05s; --cx: 72; --cy: -45; --fy: 140; }
+    .confetti-piece:nth-child(32) { animation-delay: 0.02s; --cx: -92; --cy: 85; --fy: 120; }
+    .confetti-piece:nth-child(33) { animation-delay: 0.04s; --cx: 108; --cy: -75; --fy: 160; }
+    .confetti-piece:nth-child(34) { animation-delay: 0.01s; --cx: -45; --cy: -70; --fy: 145; }
+    .confetti-piece:nth-child(35) { animation-delay: 0.05s; --cx: 58; --cy: 65; --fy: 115; }
+    .confetti-piece:nth-child(36) { animation-delay: 0.03s; --cx: -115; --cy: 25; --fy: 135; }
+    .confetti-piece:nth-child(37) { animation-delay: 0s; --cx: 42; --cy: -98; --fy: 155; }
+    .confetti-piece:nth-child(38) { animation-delay: 0.04s; --cx: -78; --cy: -35; --fy: 125; }
+    .confetti-piece:nth-child(39) { animation-delay: 0.02s; --cx: 95; --cy: 42; --fy: 145; }
+    .confetti-piece:nth-child(40) { animation-delay: 0.06s; --cx: -35; --cy: 108; --fy: 130; }
+
+    @keyframes confetti-burst {
+      0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0) rotate(0deg);
+      }
+      20% {
+        opacity: 1;
+        transform: translate(calc(-50% + var(--cx) * 1px), calc(-50% + var(--cy) * 1px)) scale(1) rotate(90deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--cx) * 1.3px), calc(-50% + var(--cy) * 1px + var(--fy) * 1px)) scale(1) rotate(720deg);
+      }
+    }
+
+    /* Peony bouquet - fixed to viewport, fully visible when card opens */
+    .bouquet-wrapper {
+      position: fixed;
+      right: 10%;
+      bottom: 5%;
+      width: 220px;
+      height: 360px;
+      opacity: 0;
+      transform: translateX(50px) scale(0.9);
+      transition: opacity 0.8s ease 0.3s, transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s;
+      pointer-events: none;
+      z-index: 3;
+      overflow: visible;
+    }
+
+    /* Bouquets hidden when message is open - clean view */
+    body.card-open .bouquet-wrapper {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .bouquet-wrapper svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      filter: drop-shadow(0 10px 28px rgba(0,0,0,0.3));
+    }
+
+    .peony-bloom {
+      animation: bloom-soft 4s ease-in-out infinite;
+    }
+
+    .peony-bloom:nth-child(1) { animation-delay: 0s; }
+    .peony-bloom:nth-child(2) { animation-delay: 0.5s; }
+    .peony-bloom:nth-child(3) { animation-delay: 1s; }
+    .peony-bloom:nth-child(4) { animation-delay: 0.2s; }
+    .peony-bloom:nth-child(5) { animation-delay: 0.7s; }
+
+    @keyframes bloom-soft {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.03); opacity: 0.95; }
+    }
+
+    /* Left bouquet - same size, positioned so full bouquet is on screen */
+    .bouquet-wrapper.left {
+      left: 10%;
+      right: auto;
+      transform: translateX(-50px) scale(0.9);
+    }
+
+    body.card-open .bouquet-wrapper.left {
+      transform: translateX(-50px) scale(0.9);
+    }
+  </style>
+</head>
+<body>
+  <div class="stars-bg">
+    <span class="star-dot"></span>
+    <span class="star-dot"></span>
+    <span class="star-dot"></span>
+    <span class="star-dot"></span>
+    <span class="star-dot"></span>
+    <span class="star-dot"></span>
+    <span class="star-dot"></span>
+    <span class="star-dot"></span>
+  </div>
+
+  <!-- Floating hearts (rise when card is open) -->
+  <div class="floating-hearts" aria-hidden="true">
+    <span>💕</span><span>❤️</span><span>💗</span><span>💕</span><span>❤️</span><span>💗</span><span>💕</span><span>❤️</span><span>💗</span>
+  </div>
+
+  <!-- Hearts burst when card opens -->
+  <div class="hearts-burst" id="hearts-burst" aria-hidden="true">
+    <span class="heart-burst-item">💕</span><span class="heart-burst-item">❤️</span><span class="heart-burst-item">💗</span>
+    <span class="heart-burst-item">💕</span><span class="heart-burst-item">❤️</span><span class="heart-burst-item">💗</span>
+    <span class="heart-burst-item">💕</span><span class="heart-burst-item">❤️</span><span class="heart-burst-item">💗</span>
+    <span class="heart-burst-item">💕</span><span class="heart-burst-item">❤️</span><span class="heart-burst-item">💗</span>
+    <span class="heart-burst-item">💕</span><span class="heart-burst-item">❤️</span><span class="heart-burst-item">💗</span>
+  </div>
+
+  <!-- Confetti pop when card opens -->
+  <div class="confetti-pop" id="confetti-pop" aria-hidden="true">
+    <span class="confetti-piece"></span><span class="confetti-piece"></span><span class="confetti-piece"></span><span class="confetti-piece"></span><span class="confetti-piece"></span>
+    <span class="confetti-piece"></span><span class="confetti-piece"></span><span class="confetti-piece"></span><span class="confetti-piece"></span><span class="confetti-piece"></span>
+    <span class="confetti-piece"></span><span class="confetti-piece"></span><span class="confetti-piece"></span><span class="confetti-piece"></span><span class="confetti-piece"></span>
+    <span class="confetti-piece"></span><span class="confetti-piece"></span><span class="confetti-piece"></span><span class="confetti-piece"></span><span class="confetti-piece"></span>
+    <span class="confetti-piece"></span><span class="confetti-piece"></span><span class="confetti-piece"></span><span class="confetti-piece"></span><span class="confetti-piece"></span>
+    <span class="confetti-piece"></span><span class="confetti-piece"></span><span class="confetti-piece"></span><span class="confetti-piece"></span><span class="confetti-piece"></span>
+    <span class="confetti-piece"></span><span class="confetti-piece"></span><span class="confetti-piece"></span><span class="confetti-piece"></span><span class="confetti-piece"></span>
+    <span class="confetti-piece"></span><span class="confetti-piece"></span><span class="confetti-piece"></span><span class="confetti-piece"></span><span class="confetti-piece"></span>
+  </div>
+
+  <div class="card-container">
+    <div class="envelope-wrapper" id="envelope">
+      <div class="envelope">
+        <div class="envelope-flap"></div>
+        <div class="envelope-front">
+          <span class="heart-icon">♥</span>
+          For You
+        </div>
+      </div>
+      <p class="open-hint">Click to open</p>
+
+      <div class="inner-card">
+        <span class="float-emoji e1">✨</span>
+        <span class="float-emoji e2">💕</span>
+        <span class="float-emoji e3">🌟</span>
+        <span class="float-emoji e4">💫</span>
+        <span class="float-emoji e5">🌸</span>
+        <span class="float-emoji e6">💖</span>
+        <div class="heart-container" id="heart-container" title="Click me!">
+          <span class="heart-surprise" aria-hidden="true">💗</span>
+          <svg class="heart-svg" viewBox="0 0 140 130" xmlns="http://www.w3.org/2000/svg">
+            <!-- Constellation: heart path with stars along it -->
+            <path class="heart-line" d="M70 118 C70 118 20 75 35 45 C48 22 70 38 70 38 C70 38 92 22 105 45 C120 75 70 118 70 118 Z"/>
+            <circle class="star" cx="70" cy="118" r="3"/>
+            <circle class="star" cx="70" cy="78" r="3.5"/>
+            <circle class="star" cx="52" cy="52" r="2.5"/>
+            <circle class="star" cx="35" cy="45" r="2.5"/>
+            <circle class="star" cx="70" cy="38" r="3.5"/>
+            <circle class="star" cx="88" cy="52" r="2.5"/>
+            <circle class="star" cx="105" cy="45" r="2.5"/>
+          </svg>
+        </div>
+        <div class="card-divider"></div>
+        <p class="card-title">Happy Valentine's Day My Baby</p>
+        <div class="emoji-strip">
+          <span>💕</span><span>✨</span><span>💫</span><span>❤️</span><span>🌟</span><span>💖</span>
+        </div>
+        <p class="card-message">
+          Every moment with you just feels great. I'm so fkin happy to have you as my girlfriend. I know I irritate you a lot but sorry to say I will never change that duh.<br><br>
+          I still can't believe that I would be the one ending up wt a gf before 2026. I'm soo lucky to have you in my life, U mean everything to me and I love youu sooo sooo much nd since the time we have started dating everything feels so great and I'm soo happy ever after.<br><br>
+          You always bring a smile on my face and I wanted to let you know that u hold a very special place in my heart and you will continue to hold that forever ♾️.<br><br>
+          Cheers to celebrating more Valentine's Day together. Love youuuuuu my babbbyyy 💗💗
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bouquets fixed to screen edges - visible when card is open -->
+  <div class="bouquet-wrapper left" aria-hidden="true">
+    <svg viewBox="0 0 200 320" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="stemGradL" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#3d6b35"/>
+          <stop offset="100%" style="stop-color:#2d5a27"/>
+        </linearGradient>
+        <radialGradient id="peony1L" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" style="stop-color:#e8a4b0"/>
+          <stop offset="60%" style="stop-color:#f0b8c2"/>
+          <stop offset="100%" style="stop-color:#f8d7da"/>
+        </radialGradient>
+        <radialGradient id="peony2L" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" style="stop-color:#d495a0"/>
+          <stop offset="50%" style="stop-color:#e8b4b8"/>
+          <stop offset="100%" style="stop-color:#f5c6cb"/>
+        </radialGradient>
+        <radialGradient id="peony3L" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" style="stop-color:#f0c0c8"/>
+          <stop offset="70%" style="stop-color:#fdf2f3"/>
+          <stop offset="100%" style="stop-color:#fff5f6"/>
+        </radialGradient>
+        <radialGradient id="peony4L" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" style="stop-color:#e09ca8"/>
+          <stop offset="55%" style="stop-color:#f0b8c2"/>
+          <stop offset="100%" style="stop-color:#f8d7da"/>
+        </radialGradient>
+        <radialGradient id="peony5L" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" style="stop-color:#c98a96"/>
+          <stop offset="50%" style="stop-color:#e8b4b8"/>
+          <stop offset="100%" style="stop-color:#fdf2f3"/>
+        </radialGradient>
+        <linearGradient id="leafGradL" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#4a7c59"/>
+          <stop offset="100%" style="stop-color:#3d6b48"/>
+        </linearGradient>
+      </defs>
+      <path fill="none" stroke="url(#stemGradL)" stroke-width="5" stroke-linecap="round"
+        d="M100 310 Q102 260 115 200 Q125 140 128 100 M100 310 Q98 255 92 195 Q88 145 82 95 M100 310 Q105 265 112 210 Q118 155 122 115 M100 310 Q95 258 85 200 Q78 155 72 108 M100 310 Q100 260 100 205 Q100 150 100 105" />
+      <ellipse cx="125" cy="220" rx="14" ry="8" fill="url(#leafGradL)" transform="rotate(25 125 220)"/>
+      <ellipse cx="75" cy="235" rx="14" ry="8" fill="url(#leafGradL)" transform="rotate(-20 75 235)"/>
+      <ellipse cx="112" cy="265" rx="12" ry="7" fill="url(#leafGradL)" transform="rotate(15 112 265)"/>
+      <ellipse cx="88" cy="255" rx="12" ry="7" fill="url(#leafGradL)" transform="rotate(-10 88 255)"/>
+      <g class="peony-bloom" transform="translate(100, 95)">
+        <ellipse cx="0" cy="0" rx="28" ry="26" fill="url(#peony1L)" opacity="0.95"/>
+        <ellipse cx="-5" cy="-4" rx="22" ry="20" fill="url(#peony1L)" opacity="0.9"/>
+        <ellipse cx="4" cy="3" rx="18" ry="16" fill="url(#peony2L)"/>
+        <circle cx="0" cy="0" r="8" fill="#d48894"/>
+      </g>
+      <g class="peony-bloom" transform="translate(142, 115)">
+        <ellipse cx="0" cy="0" rx="22" ry="20" fill="url(#peony2L)" opacity="0.95"/>
+        <ellipse cx="-3" cy="-2" rx="16" ry="15" fill="url(#peony2L)" opacity="0.9"/>
+        <circle cx="0" cy="0" r="6" fill="#c98a96"/>
+      </g>
+      <g class="peony-bloom" transform="translate(58, 108)">
+        <ellipse cx="0" cy="0" rx="24" ry="22" fill="url(#peony3L)" opacity="0.95"/>
+        <ellipse cx="3" cy="-3" rx="18" ry="16" fill="url(#peony3L)" opacity="0.9"/>
+        <circle cx="0" cy="0" r="6" fill="#e8b4b8"/>
+      </g>
+      <g class="peony-bloom" transform="translate(132, 155)">
+        <ellipse cx="0" cy="0" rx="20" ry="18" fill="url(#peony4L)" opacity="0.95"/>
+        <ellipse cx="-2" cy="2" rx="14" ry="13" fill="url(#peony4L)" opacity="0.9"/>
+        <circle cx="0" cy="0" r="5" fill="#d495a0"/>
+      </g>
+      <g class="peony-bloom" transform="translate(68, 152)">
+        <ellipse cx="0" cy="0" rx="22" ry="20" fill="url(#peony5L)" opacity="0.95"/>
+        <ellipse cx="2" cy="-2" rx="16" ry="15" fill="url(#peony5L)" opacity="0.9"/>
+        <circle cx="0" cy="0" r="6" fill="#c98a96"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="bouquet-wrapper" aria-hidden="true">
+    <svg viewBox="0 0 200 320" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="stemGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#3d6b35"/>
+          <stop offset="100%" style="stop-color:#2d5a27"/>
+        </linearGradient>
+        <radialGradient id="peony1" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" style="stop-color:#e8a4b0"/>
+          <stop offset="60%" style="stop-color:#f0b8c2"/>
+          <stop offset="100%" style="stop-color:#f8d7da"/>
+        </radialGradient>
+        <radialGradient id="peony2" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" style="stop-color:#d495a0"/>
+          <stop offset="50%" style="stop-color:#e8b4b8"/>
+          <stop offset="100%" style="stop-color:#f5c6cb"/>
+        </radialGradient>
+        <radialGradient id="peony3" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" style="stop-color:#f0c0c8"/>
+          <stop offset="70%" style="stop-color:#fdf2f3"/>
+          <stop offset="100%" style="stop-color:#fff5f6"/>
+        </radialGradient>
+        <radialGradient id="peony4" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" style="stop-color:#e09ca8"/>
+          <stop offset="55%" style="stop-color:#f0b8c2"/>
+          <stop offset="100%" style="stop-color:#f8d7da"/>
+        </radialGradient>
+        <radialGradient id="peony5" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" style="stop-color:#c98a96"/>
+          <stop offset="50%" style="stop-color:#e8b4b8"/>
+          <stop offset="100%" style="stop-color:#fdf2f3"/>
+        </radialGradient>
+        <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#4a7c59"/>
+          <stop offset="100%" style="stop-color:#3d6b48"/>
+        </linearGradient>
+      </defs>
+      <path fill="none" stroke="url(#stemGrad)" stroke-width="5" stroke-linecap="round"
+        d="M100 310 Q98 260 85 200 Q75 140 72 100 M100 310 Q102 255 108 195 Q112 145 118 95 M100 310 Q95 265 88 210 Q82 155 78 115 M100 310 Q105 258 115 200 Q122 155 128 108 M100 310 Q100 260 100 205 Q100 150 100 105" />
+      <ellipse cx="75" cy="220" rx="14" ry="8" fill="url(#leafGrad)" transform="rotate(-25 75 220)"/>
+      <ellipse cx="125" cy="235" rx="14" ry="8" fill="url(#leafGrad)" transform="rotate(20 125 235)"/>
+      <ellipse cx="88" cy="265" rx="12" ry="7" fill="url(#leafGrad)" transform="rotate(-15 88 265)"/>
+      <ellipse cx="112" cy="255" rx="12" ry="7" fill="url(#leafGrad)" transform="rotate(10 112 255)"/>
+      <g class="peony-bloom" transform="translate(100, 95)">
+        <ellipse cx="0" cy="0" rx="28" ry="26" fill="url(#peony1)" opacity="0.95"/>
+        <ellipse cx="-5" cy="-4" rx="22" ry="20" fill="url(#peony1)" opacity="0.9"/>
+        <ellipse cx="4" cy="3" rx="18" ry="16" fill="url(#peony2)"/>
+        <circle cx="0" cy="0" r="8" fill="#d48894"/>
+      </g>
+      <g class="peony-bloom" transform="translate(58, 115)">
+        <ellipse cx="0" cy="0" rx="22" ry="20" fill="url(#peony2)" opacity="0.95"/>
+        <ellipse cx="-3" cy="-2" rx="16" ry="15" fill="url(#peony2)" opacity="0.9"/>
+        <circle cx="0" cy="0" r="6" fill="#c98a96"/>
+      </g>
+      <g class="peony-bloom" transform="translate(142, 108)">
+        <ellipse cx="0" cy="0" rx="24" ry="22" fill="url(#peony3)" opacity="0.95"/>
+        <ellipse cx="3" cy="-3" rx="18" ry="16" fill="url(#peony3)" opacity="0.9"/>
+        <circle cx="0" cy="0" r="6" fill="#e8b4b8"/>
+      </g>
+      <g class="peony-bloom" transform="translate(68, 155)">
+        <ellipse cx="0" cy="0" rx="20" ry="18" fill="url(#peony4)" opacity="0.95"/>
+        <ellipse cx="-2" cy="2" rx="14" ry="13" fill="url(#peony4)" opacity="0.9"/>
+        <circle cx="0" cy="0" r="5" fill="#d495a0"/>
+      </g>
+      <g class="peony-bloom" transform="translate(132, 152)">
+        <ellipse cx="0" cy="0" rx="22" ry="20" fill="url(#peony5)" opacity="0.95"/>
+        <ellipse cx="2" cy="-2" rx="16" ry="15" fill="url(#peony5)" opacity="0.9"/>
+        <circle cx="0" cy="0" r="6" fill="#c98a96"/>
+      </g>
+    </svg>
+  </div>
+
+  <script>
+    var envelope = document.getElementById('envelope');
+    var heartsBurst = document.getElementById('hearts-burst');
+    var confettiPop = document.getElementById('confetti-pop');
+    var heartContainer = document.getElementById('heart-container');
+
+    envelope.addEventListener('click', function() {
+      var isOpening = !this.classList.contains('opened');
+      this.classList.toggle('opened');
+      document.body.classList.toggle('card-open', this.classList.contains('opened'));
+
+      if (isOpening && heartsBurst) {
+        heartsBurst.classList.remove('burst-done');
+        setTimeout(function() {
+          heartsBurst.classList.add('burst-done');
+        }, 1400);
+      }
+      if (isOpening && confettiPop) {
+        confettiPop.classList.remove('confetti-done');
+        setTimeout(function() {
+          confettiPop.classList.add('confetti-done');
+        }, 2400);
+      }
+    });
+
+    if (heartContainer) {
+      heartContainer.addEventListener('click', function(e) {
+        e.stopPropagation();
+        this.classList.add('clicked');
+        var el = this;
+        setTimeout(function() { el.classList.remove('clicked'); }, 800);
+      });
+    }
+  </script>
+</body>
+</html>
